@@ -254,6 +254,21 @@ render_graph_panel()
 # ── BOTTOM PnL BAR ───────────────────────────────────────
 render_pnl_bar(pnl_stats)
 
+# ── VIDEO SHOWCASE ───────────────────────────────────────
+st.html("""
+    <div style='color:#1a1a3e;font-family:monospace;font-size:9px;
+                letter-spacing:2px;padding:12px 0 4px 2px;'>
+        ▸ TERMINAL IN ACTION · WATCH
+    </div>
+""")
+v1, v2, v3 = st.columns(3)
+with v1:
+    st.video("videos/Online Trading Terminal.mp4")
+with v2:
+    st.video("videos/trading app.mp4")
+with v3:
+    st.video("videos/STOCK 1.mp4")
+
 # ── FOOTER ───────────────────────────────────────────────
 st.html(f"""
     <div style='
