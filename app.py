@@ -33,7 +33,7 @@ init_db()
 
 # ── Page config ──────────────────────────────────────────
 st.set_page_config(
-    page_title="OIL TERMINAL · OPUS 4.7",
+    page_title="ONLINE TRADING TERMINAL",
     page_icon="🛢️",
     layout="wide",
     initial_sidebar_state="collapsed"

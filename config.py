@@ -15,8 +15,8 @@ PERIOD       = "5d"         # Last 5 days of data
 REFRESH_SECONDS = 60        # Refresh every 60 seconds
 
 # App branding
-APP_TITLE    = "OPUS 4.7 · OIL TERMINAL"
-APP_SUBTITLE = "Crude Oil Prediction Terminal · WTI Futures"
+APP_TITLE    = "ONLINE TRADING TERMINAL"
+APP_SUBTITLE = "Crude Oil Prediction · WTI Futures · Live"
 VERSION      = "v5.0"
 
 # ── Phase 2 · OSINT News Scanner ─────────────────────────
