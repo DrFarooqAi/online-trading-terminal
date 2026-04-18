@@ -1,73 +1,62 @@
-# 🛢️ OIL TERMINAL · OPUS 4.7
-**Crude Oil Prediction Terminal — Phase 1**
+# 🛢️ ONLINE TRADING TERMINAL
+
+**Live Crude Oil AI Prediction Terminal — Free to Use**
+
+## 🚀 Try It Live — No Installation Needed
+
+**👉 [https://online-trading-terminal-drfarooq.streamlit.app/](https://online-trading-terminal-drfarooq.streamlit.app/)**
+
+Open in any browser. 100% free.
 
 ---
 
-## ⚡ Quick Start
+## 📊 Features
 
-### Step 1 — Copy project to E drive
-Place this entire folder at:
-```
-E:\oil_terminal\
-```
-
-### Step 2 — Open PowerShell and navigate
-```powershell
-cd E:\oil_terminal
-```
-
-### Step 3 — Activate Conda base
-```powershell
-C:\Users\ac\miniconda3\Scripts\activate.bat base
-```
-
-### Step 4 — Install dependencies
-```powershell
-pip install -r requirements.txt
-```
-
-### Step 5 — Run the app
-```powershell
-streamlit run app.py
-```
-
-### Step 6 — Open in browser
-```
-http://localhost:8501
-```
-
----
-
-## 📁 File Structure
-```
-oil_terminal/
-├── app.py                    ← Main app (run this)
-├── config.py                 ← All settings here
-├── requirements.txt          ← Dependencies
-├── data/
-│   ├── __init__.py
-│   └── price_feed.py         ← yfinance WTI/Brent data
-└── components/
-    ├── __init__.py
-    ├── chart.py              ← Candlestick chart builder
-    └── panels.py             ← Left/right panels + PnL bar
-```
+| Feature | Description |
+|---|---|
+| **Live Prices** | WTI Crude + Brent — real-time via Yahoo Finance |
+| **Candlestick Chart** | 5-min candles with volume |
+| **OSINT News Scanner** | RSS headlines tagged BULL / BEAR / NEUTRAL |
+| **MiroFish Graph** | D3.js force-directed relationship network |
+| **AI Signal** | LONG / SHORT with entry, target, stop, confidence % |
+| **Paper Trading** | Manual paper trade with live P&L tracking |
+| **Equity Curve** | SQLite trade log + win rate + Sharpe ratio |
 
 ---
 
 ## 🗺️ Roadmap
+
 | Phase | Feature | Status |
 |---|---|---|
-| Phase 1 | Live chart + dashboard shell | ✅ Done |
-| Phase 2 | OSINT news scanner + Gemini tagging | ⏳ Next |
-| Phase 3 | MiroFish relationship graph (D3.js) | ⏳ Planned |
-| Phase 4 | AI signal generator (entry/target/stop) | ⏳ Planned |
-| Phase 5 | PnL tracker + React migration | ⏳ Planned |
+| Phase 1 | Live chart + dark terminal UI | ✅ Done |
+| Phase 2 | OSINT news scanner + sentiment tagging | ✅ Done |
+| Phase 3 | MiroFish relationship graph (D3.js) | ✅ Done |
+| Phase 4 | AI signal generator (Gemini / rule-based) | ✅ Done |
+| Phase 5 | PnL tracker + paper trading | ✅ Done |
 
 ---
 
-## ⚠️ Notes
-- yfinance data has ~15 minute delay (free tier)
-- 5-min candles available for last 5 days only
-- App auto-refreshes every 60 seconds
-- All settings in `config.py`
+## ⚡ Run Locally
+
+```bash
+git clone https://github.com/DrFarooqAi/online-trading-terminal.git
+cd online-trading-terminal
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+---
+
+## 🤖 Enable Gemini AI Signals (Optional — Free)
+
+1. Get a free API key at [aistudio.google.com](https://aistudio.google.com)
+2. Open `config.py` and paste your key:
+```python
+GEMINI_API_KEY = "AIza..."
+```
+
+---
+
+## 💰 Cost
+$0/month — 100% free open-source stack.
+`yfinance · Streamlit · Plotly · D3.js · feedparser · SQLite`
