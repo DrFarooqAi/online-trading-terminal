@@ -66,16 +66,16 @@ def get_current_price(ticker: str) -> dict:
 
 
 def get_volume_summary(df: pd.DataFrame) -> dict:
-    """
-    Returns volume stats from the OHLCV dataframe.
-    """
     if df.empty:
         return {"current": 0, "avg": 0}
 
-    vol_current = int(df["Volume"].iloc[-1])
-    vol_avg     = int(df["Volume"].mean())
+    try:
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        vol = df["Volume"].dropna()
+        vol_current = int(vol.iloc[-1]) if not vol.empty else 0
+        vol_avg     = int(vol.mean())   if not vol.empty else 0
+    except Exception:
+        vol_current, vol_avg = 0, 0
 
-    return {
-        "current": vol_current,
-        "avg"    : vol_avg,
-    }
+    return {"current": vol_current, "avg": vol_avg}
