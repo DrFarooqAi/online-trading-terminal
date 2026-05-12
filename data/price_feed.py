@@ -9,8 +9,8 @@ import streamlit as st
 from config import TICKER_WTI, TICKER_BRENT, INTERVAL, PERIOD
 
 
-@st.cache_data(ttl=60)  # Cache for 60 seconds, then auto-refresh
-def get_ohlcv(ticker: str) -> pd.DataFrame:
+@st.cache_data(ttl=60)
+def get_ohlcv(ticker: str, interval: str = INTERVAL, period: str = PERIOD) -> pd.DataFrame:
     """
     Fetch OHLCV candlestick data for a given ticker.
     Returns cleaned DataFrame with datetime index.
@@ -18,8 +18,8 @@ def get_ohlcv(ticker: str) -> pd.DataFrame:
     try:
         df = yf.download(
             ticker,
-            period=PERIOD,
-            interval=INTERVAL,
+            period=period,
+            interval=interval,
             auto_adjust=True,
             progress=False
         )
