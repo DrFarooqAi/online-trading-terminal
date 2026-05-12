@@ -4,7 +4,17 @@
 # ─────────────────────────────────────────
 
 import streamlit as st
-from config import MODEL_SCORES, OIL_FACTORS, COLOR_UP, COLOR_DOWN, COLOR_GOLD, COLOR_ACCENT
+from config import MODEL_SCORES, OIL_FACTORS, COLOR_UP, COLOR_DOWN, COLOR_GOLD, COLOR_ACCENT, COLOR_PANEL, COLOR_TEXT
+
+_TV = {
+    "bg"      : "#131722",
+    "panel"   : "#1e222d",
+    "border"  : "#2a2e39",
+    "text"    : "#d1d4dc",
+    "muted"   : "#787b86",
+    "dim"     : "#4a4e5a",
+    "font"    : "'IBM Plex Mono', monospace",
+}
 
 
 def render_left_panel(wti_data: dict, brent_data: dict):
@@ -15,71 +25,84 @@ def render_left_panel(wti_data: dict, brent_data: dict):
     - Oil factor weights
     """
 
-    st.html("""
+    st.html(f"""
         <div style='
-            background:#0f0f1a;
-            border:1px solid #1a1a3e;
-            border-radius:6px;
-            padding:12px;
-            margin-bottom:10px;
+            background:{_TV["panel"]};
+            border:1px solid {_TV["border"]};
+            border-radius:4px;
+            padding:10px 12px;
+            margin-bottom:8px;
         '>
-            <div style='color:#888;font-size:10px;font-family:monospace;'>■ WALLET · BIN88888</div>
-            <div style='color:#00ff88;font-size:11px;font-family:monospace;margin-top:4px;'>ACTIVE</div>
-            <div style='color:#555;font-size:9px;font-family:monospace;margin-top:6px;'>30-DAY NET PROFIT</div>
-            <div style='color:#00ff88;font-size:22px;font-family:monospace;font-weight:bold;'>+$0.00</div>
-            <div style='color:#555;font-size:9px;font-family:monospace;'>SHORT/LONG · CRUDE OIL</div>
-            <div style='display:flex;gap:20px;margin-top:8px;'>
-                <div><div style='color:#555;font-size:9px;font-family:monospace;'>TRADES</div>
-                     <div style='color:#ccc;font-size:13px;font-family:monospace;'>0</div></div>
-                <div><div style='color:#555;font-size:9px;font-family:monospace;'>WINS</div>
-                     <div style='color:#ccc;font-size:13px;font-family:monospace;'>0%</div></div>
-                <div><div style='color:#555;font-size:9px;font-family:monospace;'>AVG R/R</div>
-                     <div style='color:#ccc;font-size:13px;font-family:monospace;'>-</div></div>
+            <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'>
+                <span style='color:{_TV["muted"]};font-size:9px;font-family:{_TV["font"]};letter-spacing:1px;'>ACCOUNT · BIN88888</span>
+                <span style='
+                    color:{COLOR_UP};font-size:8px;font-family:{_TV["font"]};
+                    background:{COLOR_UP}15;border:1px solid {COLOR_UP}40;
+                    padding:1px 6px;border-radius:2px;letter-spacing:1px;
+                '>● ACTIVE</span>
+            </div>
+            <div style='color:{_TV["muted"]};font-size:8px;font-family:{_TV["font"]};letter-spacing:0.5px;margin-bottom:3px;'>30-DAY NET PROFIT</div>
+            <div style='color:{COLOR_UP};font-size:20px;font-family:{_TV["font"]};font-weight:600;line-height:1;'>+$0.00</div>
+            <div style='color:{_TV["dim"]};font-size:8px;font-family:{_TV["font"]};margin-top:3px;letter-spacing:0.5px;'>CRUDE OIL · SHORT/LONG</div>
+            <div style='display:flex;gap:0;margin-top:10px;border-top:1px solid {_TV["border"]};padding-top:8px;'>
+                <div style='flex:1;text-align:center;border-right:1px solid {_TV["border"]};'>
+                    <div style='color:{_TV["muted"]};font-size:8px;font-family:{_TV["font"]};'>TRADES</div>
+                    <div style='color:{_TV["text"]};font-size:14px;font-family:{_TV["font"]};font-weight:500;'>0</div>
+                </div>
+                <div style='flex:1;text-align:center;border-right:1px solid {_TV["border"]};'>
+                    <div style='color:{_TV["muted"]};font-size:8px;font-family:{_TV["font"]};'>WIN %</div>
+                    <div style='color:{_TV["text"]};font-size:14px;font-family:{_TV["font"]};font-weight:500;'>—</div>
+                </div>
+                <div style='flex:1;text-align:center;'>
+                    <div style='color:{_TV["muted"]};font-size:8px;font-family:{_TV["font"]};'>R/R</div>
+                    <div style='color:{_TV["text"]};font-size:14px;font-family:{_TV["font"]};font-weight:500;'>—</div>
+                </div>
             </div>
         </div>
     """)
 
     # ── Model Confidence ─────────────────────────────────
-    st.html("""
-        <div style='color:#888;font-size:10px;font-family:monospace;margin-bottom:8px;'>
-            ▸ MODEL CONFIDENCE
+    st.html(f"""
+        <div style='display:flex;align-items:center;gap:6px;margin-bottom:8px;'>
+            <div style='width:2px;height:11px;background:{COLOR_ACCENT};border-radius:1px;'></div>
+            <span style='color:{_TV["muted"]};font-size:9px;font-family:{_TV["font"]};letter-spacing:1px;'>MODEL CONFIDENCE</span>
         </div>
     """)
 
     for model, score in MODEL_SCORES.items():
-        color = COLOR_UP if score >= 90 else COLOR_GOLD if score >= 80 else "#ff8c00"
-        bar_width = score
+        color = COLOR_UP if score >= 90 else COLOR_GOLD if score >= 80 else "#e65c00"
         st.html(f"""
-            <div style='margin-bottom:6px;'>
-                <div style='display:flex;justify-content:space-between;'>
-                    <span style='color:#aaa;font-size:9px;font-family:monospace;'>{model}</span>
-                    <span style='color:{color};font-size:9px;font-family:monospace;'>{score}%</span>
+            <div style='margin-bottom:7px;'>
+                <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;'>
+                    <span style='color:{_TV["text"]};font-size:9px;font-family:{_TV["font"]};'>{model}</span>
+                    <span style='color:{color};font-size:9px;font-family:{_TV["font"]};font-weight:500;'>{score}%</span>
                 </div>
-                <div style='background:#1a1a2e;border-radius:2px;height:4px;margin-top:2px;'>
-                    <div style='background:{color};width:{bar_width}%;height:4px;border-radius:2px;'></div>
+                <div style='background:{_TV["bg"]};border-radius:1px;height:3px;'>
+                    <div style='background:{color};width:{score}%;height:3px;border-radius:1px;opacity:0.85;'></div>
                 </div>
             </div>
         """)
 
-    st.html("<hr style='border-color:#1a1a2e;margin:10px 0;'>")
+    st.html(f"<div style='border-top:1px solid {_TV['border']};margin:10px 0 8px;'></div>")
 
     # ── Oil Factor Weights ───────────────────────────────
-    st.html("""
-        <div style='color:#888;font-size:10px;font-family:monospace;margin-bottom:8px;'>
-            ▸ OIL FACTOR WEIGHTS
+    st.html(f"""
+        <div style='display:flex;align-items:center;gap:6px;margin-bottom:8px;'>
+            <div style='width:2px;height:11px;background:{COLOR_GOLD};border-radius:1px;'></div>
+            <span style='color:{_TV["muted"]};font-size:9px;font-family:{_TV["font"]};letter-spacing:1px;'>OIL FACTOR WEIGHTS</span>
         </div>
     """)
 
     for factor, weight in OIL_FACTORS.items():
-        color = COLOR_ACCENT if weight >= 80 else COLOR_GOLD if weight >= 65 else "#888"
+        color = COLOR_ACCENT if weight >= 80 else COLOR_GOLD if weight >= 65 else _TV["muted"]
         st.html(f"""
-            <div style='margin-bottom:6px;'>
-                <div style='display:flex;justify-content:space-between;'>
-                    <span style='color:#aaa;font-size:9px;font-family:monospace;'>{factor}</span>
-                    <span style='color:{color};font-size:9px;font-family:monospace;'>{weight}%</span>
+            <div style='margin-bottom:7px;'>
+                <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;'>
+                    <span style='color:{_TV["text"]};font-size:9px;font-family:{_TV["font"]};'>{factor}</span>
+                    <span style='color:{color};font-size:9px;font-family:{_TV["font"]};font-weight:500;'>{weight}%</span>
                 </div>
-                <div style='background:#1a1a2e;border-radius:2px;height:3px;margin-top:2px;'>
-                    <div style='background:{color};width:{weight}%;height:3px;border-radius:2px;'></div>
+                <div style='background:{_TV["bg"]};border-radius:1px;height:3px;'>
+                    <div style='background:{color};width:{weight}%;height:3px;border-radius:1px;opacity:0.85;'></div>
                 </div>
             </div>
         """)
@@ -90,69 +113,77 @@ def render_right_panel(news_items: list = None, signal: dict = None):
         news_items = []
 
     tag_colors = {
-        "BULL"   : ("#00ff88", "#0a2e1a"),
-        "BEAR"   : ("#ff3c3c", "#2e0a0a"),
-        "NEUTRAL": ("#ffd700", "#2e2a00"),
+        "BULL"   : (COLOR_UP,   f"{COLOR_UP}12",   f"{COLOR_UP}50"),
+        "BEAR"   : (COLOR_DOWN, f"{COLOR_DOWN}12",  f"{COLOR_DOWN}50"),
+        "NEUTRAL": (COLOR_GOLD, f"{COLOR_GOLD}12",  f"{COLOR_GOLD}50"),
     }
 
     gemini_active = bool(__import__("config").GEMINI_API_KEY)
-    engine_label  = "GEMINI·TAGGED" if gemini_active else "KEYWORD·TAGGED"
-    count_label   = f"{len(news_items)} headlines" if news_items else "no data"
+    engine_label  = "GEMINI" if gemini_active else "KEYWORD"
+    count_label   = f"{len(news_items)}" if news_items else "0"
 
-    header = f"""
+    st.html(f"""
         <div style='
-            background:#0f0f1a;
-            border:1px solid #1a1a3e;
-            border-radius:6px 6px 0 0;
-            padding:8px 12px 6px;
+            background:{_TV["panel"]};
+            border:1px solid {_TV["border"]};
+            border-radius:4px 4px 0 0;
+            padding:8px 10px 6px;
         '>
             <div style='display:flex;justify-content:space-between;align-items:center;'>
-                <span style='color:#888;font-size:10px;font-family:monospace;'>■ OSINT · NEWS SCANNER</span>
-                <span style='color:#333;font-size:8px;font-family:monospace;'>{engine_label}</span>
+                <div style='display:flex;align-items:center;gap:6px;'>
+                    <div style='width:2px;height:11px;background:{COLOR_ACCENT};border-radius:1px;'></div>
+                    <span style='color:{_TV["text"]};font-size:10px;font-family:{_TV["font"]};font-weight:500;letter-spacing:0.5px;'>NEWS SCANNER</span>
+                </div>
+                <div style='display:flex;align-items:center;gap:6px;'>
+                    <span style='color:{_TV["dim"]};font-size:8px;font-family:{_TV["font"]};'>{engine_label}</span>
+                    <span style='
+                        background:{COLOR_ACCENT}15;color:{COLOR_ACCENT};
+                        font-size:8px;font-family:{_TV["font"]};
+                        padding:1px 5px;border-radius:2px;border:1px solid {COLOR_ACCENT}30;
+                    '>{count_label} HEADLINES</span>
+                </div>
             </div>
-            <div style='color:#333;font-size:8px;font-family:monospace;margin-top:2px;'>
-                {count_label} · 5m cache · OilPrice · Yahoo · MarketWatch
+            <div style='color:{_TV["dim"]};font-size:8px;font-family:{_TV["font"]};margin-top:3px;'>
+                OilPrice · Yahoo Finance · MarketWatch · 5m cache
             </div>
         </div>
-    """
-    st.html(header)
+    """)
 
     if not news_items:
-        st.html("""
+        st.html(f"""
             <div style='
-                background:#0f0f1a;border:1px solid #1a1a3e;border-top:none;
-                border-radius:0 0 6px 6px;padding:20px 12px;text-align:center;
+                background:{_TV["panel"]};border:1px solid {_TV["border"]};border-top:none;
+                border-radius:0 0 4px 4px;padding:20px;text-align:center;
             '>
-                <span style='color:#333;font-size:10px;font-family:monospace;'>
-                    ── no headlines loaded ──
-                </span>
+                <span style='color:{_TV["muted"]};font-size:10px;font-family:{_TV["font"]};'>No headlines loaded</span>
             </div>
         """)
     else:
         rows_html = ""
         for item in news_items:
             tag   = item.get("tag", "NEUTRAL")
-            color, bg = tag_colors.get(tag, tag_colors["NEUTRAL"])
+            color, bg, border = tag_colors.get(tag, tag_colors["NEUTRAL"])
             title = item["title"]
-            short = title if len(title) <= 58 else title[:55] + "…"
+            short = title if len(title) <= 56 else title[:53] + "…"
             src   = item.get("source", "")
             rows_html += f"""
                 <div style='
-                    padding:7px 12px;
-                    border-bottom:1px solid #111122;
+                    padding:6px 10px;
+                    border-bottom:1px solid {_TV["bg"]};
+                    transition:background 0.1s;
                 '>
                     <div style='display:flex;align-items:flex-start;gap:6px;'>
                         <span style='
-                            background:{bg};color:{color};
-                            font-family:monospace;font-size:7px;font-weight:bold;
-                            padding:1px 4px;border-radius:2px;border:1px solid {color}33;
-                            white-space:nowrap;margin-top:1px;flex-shrink:0;
+                            background:{bg};color:{color};border:1px solid {border};
+                            font-family:{_TV["font"]};font-size:7px;font-weight:600;
+                            padding:1px 5px;border-radius:2px;
+                            white-space:nowrap;margin-top:2px;flex-shrink:0;letter-spacing:0.5px;
                         '>{tag}</span>
-                        <span style='color:#bbb;font-family:monospace;font-size:9px;line-height:1.4;'>
+                        <span style='color:{_TV["text"]};font-family:{_TV["font"]};font-size:9px;line-height:1.45;'>
                             {short}
                         </span>
                     </div>
-                    <div style='color:#333;font-family:monospace;font-size:8px;margin-top:3px;padding-left:44px;'>
+                    <div style='color:{_TV["dim"]};font-family:{_TV["font"]};font-size:8px;margin-top:2px;padding-left:38px;'>
                         {src}
                     </div>
                 </div>
@@ -160,8 +191,8 @@ def render_right_panel(news_items: list = None, signal: dict = None):
 
         st.html(f"""
             <div style='
-                background:#0a0a12;border:1px solid #1a1a3e;border-top:none;
-                border-radius:0 0 6px 6px;max-height:420px;overflow-y:auto;
+                background:{_TV["bg"]};border:1px solid {_TV["border"]};border-top:none;
+                border-radius:0 0 4px 4px;max-height:380px;overflow-y:auto;
             '>
                 {rows_html}
             </div>
@@ -175,21 +206,17 @@ def _render_signal(signal: dict):
     from datetime import datetime
 
     if not signal or signal.get("engine") == "OFFLINE" or not signal.get("direction"):
-        st.html("""
+        st.html(f"""
             <div style='
-                background:#0f0f1a;border:1px solid #1a1a3e;
-                border-radius:6px;padding:12px;margin-top:10px;
+                background:{_TV["panel"]};border:1px solid {_TV["border"]};
+                border-radius:4px;padding:10px;margin-top:8px;
             '>
-                <div style='color:#888;font-size:10px;font-family:monospace;'>
-                    ■ TRADE SIGNAL · LIVE PREDICTION
+                <div style='display:flex;align-items:center;gap:6px;margin-bottom:8px;'>
+                    <div style='width:2px;height:11px;background:{COLOR_ACCENT};border-radius:1px;'></div>
+                    <span style='color:{_TV["text"]};font-size:10px;font-family:{_TV["font"]};font-weight:500;'>TRADE SIGNAL</span>
                 </div>
-                <div style='
-                    background:#1a1a2e;border-radius:4px;padding:10px;
-                    margin-top:10px;text-align:center;
-                '>
-                    <div style='color:#333;font-size:10px;font-family:monospace;'>
-                        NO MARKET DATA
-                    </div>
+                <div style='background:{_TV["bg"]};border-radius:3px;padding:12px;text-align:center;'>
+                    <span style='color:{_TV["muted"]};font-size:9px;font-family:{_TV["font"]};'>Awaiting market data…</span>
                 </div>
             </div>
         """)
@@ -204,9 +231,9 @@ def _render_signal(signal: dict):
     engine    = signal.get("engine", "")
 
     is_long     = direction == "LONG"
-    dir_color   = "#00ff88" if is_long else "#ff3c3c"
-    dir_bg      = "#0a2e1a" if is_long else "#2e0a0a"
-    dir_border  = "#00ff8833" if is_long else "#ff3c3c33"
+    dir_color   = COLOR_UP   if is_long else COLOR_DOWN
+    dir_bg      = f"{COLOR_UP}0f"   if is_long else f"{COLOR_DOWN}0f"
+    dir_border  = f"{COLOR_UP}35"   if is_long else f"{COLOR_DOWN}35"
     dir_icon    = "▲" if is_long else "▼"
 
     t_diff = target - entry
@@ -215,75 +242,76 @@ def _render_signal(signal: dict):
     s_pct  = (s_diff / entry) * 100 if entry else 0
     rr     = abs(t_diff / s_diff) if s_diff != 0 else 0
 
-    t_color = "#00ff88" if t_diff >= 0 else "#ff3c3c"
-    s_color = "#ff3c3c" if s_diff <= 0 else "#00ff88"
+    t_color = COLOR_UP   if t_diff >= 0 else COLOR_DOWN
+    s_color = COLOR_DOWN if s_diff <= 0 else COLOR_UP
 
-    conf_filled = conf // 10
-    conf_bar    = "█" * conf_filled + "░" * (10 - conf_filled)
-    conf_color  = "#00ff88" if conf >= 70 else COLOR_GOLD if conf >= 50 else "#888"
+    conf_pct   = conf
+    conf_color = COLOR_UP if conf >= 70 else COLOR_GOLD if conf >= 50 else _TV["muted"]
 
     ts = datetime.now().strftime("%H:%M")
 
     st.html(f"""
         <div style='
-            background:#0f0f1a;border:1px solid #1a1a3e;
-            border-radius:6px;padding:12px;margin-top:10px;
+            background:{_TV["panel"]};border:1px solid {_TV["border"]};
+            border-radius:4px;padding:10px;margin-top:8px;
         '>
             <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'>
-                <span style='color:#888;font-size:10px;font-family:monospace;'>■ TRADE SIGNAL</span>
-                <span style='color:#333;font-size:8px;font-family:monospace;'>{engine}</span>
+                <div style='display:flex;align-items:center;gap:6px;'>
+                    <div style='width:2px;height:11px;background:{dir_color};border-radius:1px;'></div>
+                    <span style='color:{_TV["text"]};font-size:10px;font-family:{_TV["font"]};font-weight:500;'>TRADE SIGNAL</span>
+                </div>
+                <span style='color:{_TV["dim"]};font-size:8px;font-family:{_TV["font"]};'>{engine} · {ts}</span>
             </div>
 
             <div style='
                 background:{dir_bg};border:1px solid {dir_border};
-                border-radius:4px;padding:8px 12px;margin-bottom:10px;
+                border-radius:3px;padding:8px 10px;margin-bottom:8px;
                 display:flex;justify-content:space-between;align-items:center;
             '>
-                <span style='color:{dir_color};font-family:monospace;font-size:16px;font-weight:bold;'>
+                <span style='color:{dir_color};font-family:{_TV["font"]};font-size:18px;font-weight:600;'>
                     {dir_icon} {direction}
                 </span>
-                <span style='color:{conf_color};font-family:monospace;font-size:10px;'>
-                    {conf}% CONF
-                </span>
+                <div style='text-align:right;'>
+                    <div style='color:{conf_color};font-family:{_TV["font"]};font-size:13px;font-weight:600;'>{conf}%</div>
+                    <div style='color:{_TV["dim"]};font-family:{_TV["font"]};font-size:8px;'>CONFIDENCE</div>
+                </div>
+            </div>
+
+            <div style='background:{_TV["bg"]};border-radius:2px;height:3px;margin-bottom:8px;'>
+                <div style='background:{conf_color};width:{conf_pct}%;height:3px;border-radius:2px;'></div>
+            </div>
+
+            <div style='display:flex;flex-direction:column;gap:4px;margin-bottom:8px;'>
+                <div style='display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid {_TV["border"]};'>
+                    <span style='color:{_TV["muted"]};font-family:{_TV["font"]};font-size:9px;'>ENTRY</span>
+                    <span style='color:{_TV["text"]};font-family:{_TV["font"]};font-size:9px;font-weight:500;'>${entry:.2f}</span>
+                </div>
+                <div style='display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid {_TV["border"]};'>
+                    <span style='color:{_TV["muted"]};font-family:{_TV["font"]};font-size:9px;'>TARGET</span>
+                    <span style='font-family:{_TV["font"]};font-size:9px;'>
+                        <span style='color:{t_color};font-weight:500;'>${target:.2f}</span>
+                        <span style='color:{_TV["dim"]};'> {t_pct:+.2f}%</span>
+                    </span>
+                </div>
+                <div style='display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid {_TV["border"]};'>
+                    <span style='color:{_TV["muted"]};font-family:{_TV["font"]};font-size:9px;'>STOP</span>
+                    <span style='font-family:{_TV["font"]};font-size:9px;'>
+                        <span style='color:{s_color};font-weight:500;'>${stop:.2f}</span>
+                        <span style='color:{_TV["dim"]};'> {s_pct:+.2f}%</span>
+                    </span>
+                </div>
+                <div style='display:flex;justify-content:space-between;padding:3px 0;'>
+                    <span style='color:{_TV["muted"]};font-family:{_TV["font"]};font-size:9px;'>R/R RATIO</span>
+                    <span style='color:{COLOR_GOLD};font-family:{_TV["font"]};font-size:9px;font-weight:500;'>{rr:.1f} : 1</span>
+                </div>
             </div>
 
             <div style='
-                font-family:monospace;font-size:8px;color:{conf_color};
-                letter-spacing:0.5px;margin-bottom:10px;
-            '>{conf_bar}</div>
-
-            <div style='margin-bottom:4px;display:flex;justify-content:space-between;'>
-                <span style='color:#555;font-family:monospace;font-size:9px;'>ENTRY</span>
-                <span style='color:#ccc;font-family:monospace;font-size:9px;'>${entry:.2f}</span>
-            </div>
-            <div style='margin-bottom:4px;display:flex;justify-content:space-between;'>
-                <span style='color:#555;font-family:monospace;font-size:9px;'>TARGET</span>
-                <span style='font-family:monospace;font-size:9px;'>
-                    <span style='color:{t_color};'>${target:.2f}</span>
-                    <span style='color:#333;'> {t_pct:+.2f}%</span>
-                </span>
-            </div>
-            <div style='margin-bottom:4px;display:flex;justify-content:space-between;'>
-                <span style='color:#555;font-family:monospace;font-size:9px;'>STOP</span>
-                <span style='font-family:monospace;font-size:9px;'>
-                    <span style='color:{s_color};'>${stop:.2f}</span>
-                    <span style='color:#333;'> {s_pct:+.2f}%</span>
-                </span>
-            </div>
-            <div style='margin-bottom:10px;display:flex;justify-content:space-between;'>
-                <span style='color:#555;font-family:monospace;font-size:9px;'>R/R</span>
-                <span style='color:#ffd700;font-family:monospace;font-size:9px;'>{rr:.1f}:1</span>
-            </div>
-
-            <div style='
-                background:#0a0a14;border-radius:3px;padding:6px 8px;
-                color:#444;font-family:monospace;font-size:8px;line-height:1.5;
-                margin-bottom:6px;
+                background:{_TV["bg"]};border-left:2px solid {_TV["border"]};
+                padding:5px 8px;
+                color:{_TV["muted"]};font-family:{_TV["font"]};font-size:8px;line-height:1.5;
+                border-radius:0 2px 2px 0;
             '>{reason}</div>
-
-            <div style='color:#222;font-family:monospace;font-size:8px;'>
-                GENERATED &middot; {ts}
-            </div>
         </div>
     """)
 
@@ -294,7 +322,13 @@ def render_trade_form(wti_price: float, signal: dict, open_trades: list):
     sig_target = signal.get("target", round(wti_price * 1.012, 2)) if signal else round(wti_price * 1.012, 2)
     sig_stop   = signal.get("stop",   round(wti_price * 0.995, 2)) if signal else round(wti_price * 0.995, 2)
 
-    st.html("<div style='color:#888;font-family:monospace;font-size:10px;margin-top:10px;letter-spacing:1px;'>■ PAPER TRADE · MANUAL ENTRY</div>")
+    st.html(f"""
+        <div style='display:flex;align-items:center;gap:6px;margin-top:10px;margin-bottom:4px;'>
+            <div style='width:2px;height:11px;background:{COLOR_GOLD};border-radius:1px;'></div>
+            <span style='color:{_TV["text"]};font-size:10px;font-family:{_TV["font"]};font-weight:500;letter-spacing:0.5px;'>PAPER TRADE</span>
+            <span style='color:{_TV["dim"]};font-size:8px;font-family:{_TV["font"]};'>MANUAL ENTRY</span>
+        </div>
+    """)
 
     with st.form("paper_trade", clear_on_submit=True):
         c1, c2, c3 = st.columns(3)
@@ -324,24 +358,29 @@ def render_trade_form(wti_price: float, signal: dict, open_trades: list):
     if open_trades:
         for trade in open_trades:
             d_color = COLOR_UP if trade["direction"] == "LONG" else COLOR_DOWN
+            d_bg    = f"{COLOR_UP}0f" if trade["direction"] == "LONG" else f"{COLOR_DOWN}0f"
             d_icon  = "▲" if trade["direction"] == "LONG" else "▼"
             pnl_now = (wti_price - trade["entry"]) if trade["direction"] == "LONG" else (trade["entry"] - wti_price)
             pnl_col = COLOR_UP if pnl_now >= 0 else COLOR_DOWN
             st.html(f"""
                 <div style='
-                    background:#0f0f1a;border:1px solid #1a1a3e;border-radius:4px;
-                    padding:8px 10px;margin-top:6px;font-family:monospace;
+                    background:{d_bg};border:1px solid {d_color}35;border-radius:3px;
+                    padding:7px 10px;margin-top:6px;font-family:{_TV["font"]};
                 '>
                     <div style='display:flex;justify-content:space-between;align-items:center;'>
-                        <span style='color:{d_color};font-size:12px;font-weight:bold;'>{d_icon} {trade["direction"]} @ ${trade["entry"]:.2f}</span>
-                        <span style='color:{pnl_col};font-size:13px;font-weight:bold;'>{pnl_now:+.2f}</span>
+                        <span style='color:{d_color};font-size:11px;font-weight:600;'>{d_icon} {trade["direction"]}</span>
+                        <span style='color:{_TV["muted"]};font-size:9px;'>@ ${trade["entry"]:.2f}</span>
+                        <span style='color:{pnl_col};font-size:13px;font-weight:600;'>{pnl_now:+.2f}</span>
                     </div>
-                    <div style='color:#333;font-size:8px;margin-top:3px;'>
-                        TGT ${trade["target"]:.2f} &nbsp;·&nbsp; STP ${trade["stop"]:.2f} &nbsp;·&nbsp; {trade.get("engine","")}
+                    <div style='color:{_TV["dim"]};font-size:8px;margin-top:3px;'>
+                        TGT <span style='color:{COLOR_UP}'>${trade["target"]:.2f}</span>
+                        &nbsp;·&nbsp;
+                        STP <span style='color:{COLOR_DOWN}'>${trade["stop"]:.2f}</span>
+                        &nbsp;·&nbsp; {trade.get("engine","")}
                     </div>
                 </div>
             """)
-            if st.button(f"CLOSE AT MARKET  ·  ${wti_price:.2f}", key=f"close_{trade['id']}", use_container_width=True):
+            if st.button(f"✕  CLOSE  ·  ${wti_price:.2f}", key=f"close_{trade['id']}", use_container_width=True):
                 close_trade(trade["id"], wti_price, "WIN" if pnl_now >= 0 else "LOSS")
                 st.rerun()
 
@@ -368,16 +407,36 @@ def render_pnl_bar(stats: dict = None):
 
     st.html(f"""
         <div style='
-            background:#0a0a14;border-top:1px solid #1a1a3e;
-            padding:8px 16px;font-family:monospace;font-size:10px;color:#333;
-            display:flex;gap:24px;margin-top:10px;flex-wrap:wrap;
+            background:{_TV["panel"]};border-top:1px solid {_TV["border"]};
+            padding:7px 14px;font-family:"IBM Plex Mono",monospace;font-size:9px;
+            display:flex;align-items:center;gap:0;margin-top:8px;flex-wrap:wrap;
         '>
-            <span style='color:#1a1a3e;'>BIN88888 · PNL HISTORY · CRUDE OIL</span>
-            <span>TOTAL <span style='color:{total_color};'>{total_str}</span></span>
-            <span>TRADES <span style='color:#555;'>{trades}</span></span>
-            <span>WIN <span style='color:{wr_color};'>{wr_str}</span></span>
-            <span>AVG <span style='color:{avg_color};'>{avg_str}</span></span>
-            <span>MAX DD <span style='color:#ff3c3c;'>{dd_str}</span></span>
-            <span>SHARPE <span style='color:{sh_color};'>{sh_str}</span></span>
+            <span style='color:{_TV["muted"]};letter-spacing:0.5px;padding-right:16px;border-right:1px solid {_TV["border"]};margin-right:16px;'>
+                BIN88888 · CRUDE OIL
+            </span>
+            <span style='padding-right:16px;border-right:1px solid {_TV["border"]};margin-right:16px;'>
+                <span style='color:{_TV["dim"]};'>NET P&amp;L </span>
+                <span style='color:{total_color};font-weight:600;'>{total_str}</span>
+            </span>
+            <span style='padding-right:16px;border-right:1px solid {_TV["border"]};margin-right:16px;'>
+                <span style='color:{_TV["dim"]};'>TRADES </span>
+                <span style='color:{_TV["text"]};'>{trades}</span>
+            </span>
+            <span style='padding-right:16px;border-right:1px solid {_TV["border"]};margin-right:16px;'>
+                <span style='color:{_TV["dim"]};'>WIN% </span>
+                <span style='color:{wr_color};font-weight:500;'>{wr_str}</span>
+            </span>
+            <span style='padding-right:16px;border-right:1px solid {_TV["border"]};margin-right:16px;'>
+                <span style='color:{_TV["dim"]};'>AVG </span>
+                <span style='color:{avg_color};'>{avg_str}</span>
+            </span>
+            <span style='padding-right:16px;border-right:1px solid {_TV["border"]};margin-right:16px;'>
+                <span style='color:{_TV["dim"]};'>MAX DD </span>
+                <span style='color:{COLOR_DOWN};'>{dd_str}</span>
+            </span>
+            <span>
+                <span style='color:{_TV["dim"]};'>SHARPE </span>
+                <span style='color:{sh_color};font-weight:500;'>{sh_str}</span>
+            </span>
         </div>
     """)

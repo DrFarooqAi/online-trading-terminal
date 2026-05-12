@@ -1,13 +1,25 @@
 import streamlit as st
 import plotly.graph_objects as go
-from config import COLOR_BG, COLOR_UP, COLOR_DOWN, COLOR_ACCENT, COLOR_GOLD
+from config import COLOR_BG, COLOR_UP, COLOR_DOWN, COLOR_ACCENT, COLOR_GOLD, COLOR_PANEL, COLOR_TEXT
+
+_TV = {
+    "bg"    : "#131722",
+    "panel" : "#1e222d",
+    "border": "#2a2e39",
+    "text"  : "#d1d4dc",
+    "muted" : "#787b86",
+    "dim"   : "#4a4e5a",
+    "font"  : "'IBM Plex Mono', monospace",
+}
 
 
 def render_pnl_panel(stats: dict, trades: list):
-    st.html("""
-        <div style='color:#1a1a3e;font-family:monospace;font-size:9px;
-                    letter-spacing:2px;padding:4px 0 2px 2px;'>
-            ▸ PNL TRACKER &middot; EQUITY CURVE &middot; TRADE LOG
+    st.html(f"""
+        <div style='display:flex;align-items:center;gap:8px;padding:8px 4px 5px;border-top:1px solid {_TV["border"]};margin-top:4px;'>
+            <div style='width:3px;height:14px;background:{COLOR_ACCENT};border-radius:2px;'></div>
+            <span style='color:{_TV["text"]};font-family:{_TV["font"]};font-size:10px;font-weight:600;letter-spacing:0.5px;'>PNL TRACKER</span>
+            <span style='color:{_TV["dim"]};font-family:{_TV["font"]};font-size:9px;'>EQUITY CURVE · TRADE LOG</span>
+            <div style='flex:1;height:1px;background:{_TV["border"]};'></div>
         </div>
     """)
 
@@ -30,7 +42,7 @@ def _render_equity_curve(stats: dict):
         fig.add_annotation(
             text="NO CLOSED TRADES YET · AUTO-LOGS WHEN SIGNAL CHANGES",
             xref="paper", yref="paper", x=0.5, y=0.5,
-            font=dict(color="#1a1a3e", family="monospace", size=10),
+            font=dict(color="#888", family="monospace", size=10),
             showarrow=False,
         )
     else:
@@ -55,23 +67,28 @@ def _render_equity_curve(stats: dict):
     pnl_sign    = "+" if final_pnl >= 0 else ""
 
     fig.update_layout(
-        paper_bgcolor=COLOR_BG, plot_bgcolor="#09090f",
-        margin=dict(l=8, r=8, t=32, b=8), height=200,
+        paper_bgcolor=_TV["bg"], plot_bgcolor=_TV["panel"],
+        margin=dict(l=0, r=52, t=28, b=0), height=190,
         showlegend=False,
         title=dict(
-            text=f"EQUITY CURVE &nbsp;·&nbsp; <span style='color:{pnl_color}'>{pnl_sign}${final_pnl:.2f}</span>",
-            font=dict(color=COLOR_ACCENT, size=11, family="monospace"), x=0.01,
+            text=f"EQUITY CURVE &nbsp;&nbsp;<span style='color:{pnl_color};font-weight:600'>{pnl_sign}${final_pnl:.2f}</span>",
+            font=dict(color=_TV["muted"], size=9, family="'IBM Plex Mono', monospace"), x=0.01,
         ),
         xaxis=dict(
-            showgrid=False,
-            tickfont=dict(color="#333", size=8, family="monospace"),
+            showgrid=True, gridcolor=_TV["border"],
+            tickfont=dict(color=_TV["dim"], size=8, family="'IBM Plex Mono', monospace"),
+            linecolor=_TV["border"], zeroline=False,
         ),
         yaxis=dict(
-            showgrid=True, gridcolor="#0d0d1a",
-            tickfont=dict(color="#555", size=9, family="monospace"),
+            showgrid=True, gridcolor=_TV["border"],
+            tickfont=dict(color=_TV["muted"], size=9, family="'IBM Plex Mono', monospace"),
             tickprefix="$", side="right",
+            linecolor=_TV["border"], zeroline=False,
         ),
-        hoverlabel=dict(bgcolor="#0f0f1a", font_color="#ccc", font_family="monospace"),
+        hoverlabel=dict(
+            bgcolor=_TV["panel"], bordercolor=_TV["border"],
+            font_color=_TV["text"], font_family="'IBM Plex Mono', monospace",
+        ),
     )
 
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
@@ -87,36 +104,36 @@ def _render_trade_table(trades: list, stats: dict):
 
     st.html(f"""
         <div style='
-            background:#0a0a12;border:1px solid #1a1a3e;
+            background:{_TV["panel"]};border:1px solid {_TV["border"]};
             border-radius:4px;padding:8px 10px;
-            font-family:monospace;font-size:8px;
+            font-family:{_TV["font"]};font-size:8px;
             display:flex;gap:16px;margin-bottom:6px;flex-wrap:wrap;
         '>
             <div>
-                <div style='color:#333;'>WIN RATE</div>
+                <div style='color:{_TV["muted"]};'>WIN RATE</div>
                 <div style='color:{wr_color};font-size:13px;font-weight:bold;'>{win_rate:.1f}%</div>
             </div>
             <div>
-                <div style='color:#333;'>SHARPE</div>
+                <div style='color:{_TV["muted"]};'>SHARPE</div>
                 <div style='color:{sh_color};font-size:13px;font-weight:bold;'>{sharpe if sharpe is not None else "--"}</div>
             </div>
             <div>
-                <div style='color:#333;'>MAX DD</div>
-                <div style='color:#ff3c3c;font-size:13px;font-weight:bold;'>${max_dd:.2f}</div>
+                <div style='color:{_TV["muted"]};'>MAX DD</div>
+                <div style='color:{COLOR_DOWN};font-size:13px;font-weight:bold;'>${max_dd:.2f}</div>
             </div>
             <div>
-                <div style='color:#333;'>TRADES</div>
-                <div style='color:#ccc;font-size:13px;font-weight:bold;'>{stats.get("trade_count", 0)}</div>
+                <div style='color:{_TV["muted"]};'>TRADES</div>
+                <div style='color:{_TV["text"]};font-size:13px;font-weight:bold;'>{stats.get("trade_count", 0)}</div>
             </div>
         </div>
     """)
 
     if not trades:
-        st.html("""
-            <div style='background:#0a0a12;border:1px solid #1a1a3e;border-radius:4px;
+        st.html(f"""
+            <div style='background:{_TV["bg"]};border:1px solid {_TV["border"]};border-radius:4px;
                         padding:20px;text-align:center;height:130px;
                         display:flex;align-items:center;justify-content:center;'>
-                <span style='color:#1a1a3e;font-family:monospace;font-size:9px;'>── no trades yet ──</span>
+                <span style='color:{_TV["muted"]};font-family:{_TV["font"]};font-size:9px;'>── no trades yet ──</span>
             </div>
         """)
         return
@@ -133,25 +150,25 @@ def _render_trade_table(trades: list, stats: dict):
         time_str = t["opened_at"][11:16] if t.get("opened_at") else "--"
 
         rows_html += f"""
-            <tr style='border-bottom:1px solid #0d0d1a;'>
-                <td style='color:#333;font-size:8px;padding:3px 4px;'>{time_str}</td>
+            <tr style='border-bottom:1px solid {_TV["bg"]};'>
+                <td style='color:{_TV["dim"]};font-size:8px;padding:3px 4px;font-family:{_TV["font"]};'>{time_str}</td>
                 <td style='color:{d_color};font-size:8px;padding:3px 4px;'>{d_icon}</td>
-                <td style='color:#555;font-size:8px;padding:3px 4px;'>${t["entry"]:.2f}</td>
-                <td style='color:{pnl_col};font-size:8px;padding:3px 4px;'>{pnl_str}</td>
-                <td style='color:{r_col};font-size:8px;padding:3px 4px;font-weight:bold;'>{r_txt}</td>
+                <td style='color:{_TV["muted"]};font-size:8px;padding:3px 4px;font-family:{_TV["font"]};'>${t["entry"]:.2f}</td>
+                <td style='color:{pnl_col};font-size:8px;padding:3px 4px;font-family:{_TV["font"]};'>{pnl_str}</td>
+                <td style='color:{r_col};font-size:8px;padding:3px 4px;font-family:{_TV["font"]};font-weight:bold;'>{r_txt}</td>
             </tr>
         """
 
     st.html(f"""
-        <div style='background:#0a0a12;border:1px solid #1a1a3e;border-radius:4px;
+        <div style='background:{_TV["bg"]};border:1px solid {_TV["border"]};border-radius:4px;
                     padding:6px 8px;overflow-y:auto;max-height:140px;'>
-            <table style='width:100%;border-collapse:collapse;font-family:monospace;'>
+            <table style='width:100%;border-collapse:collapse;font-family:{_TV["font"]};'>
                 <tr>
-                    <th style='color:#1a1a3e;font-size:8px;text-align:left;padding:2px 4px;'>TIME</th>
-                    <th style='color:#1a1a3e;font-size:8px;text-align:left;padding:2px 4px;'>D</th>
-                    <th style='color:#1a1a3e;font-size:8px;text-align:left;padding:2px 4px;'>ENTRY</th>
-                    <th style='color:#1a1a3e;font-size:8px;text-align:left;padding:2px 4px;'>PNL</th>
-                    <th style='color:#1a1a3e;font-size:8px;text-align:left;padding:2px 4px;'>RES</th>
+                    <th style='color:{_TV["dim"]};font-size:8px;text-align:left;padding:2px 4px;'>TIME</th>
+                    <th style='color:{_TV["dim"]};font-size:8px;text-align:left;padding:2px 4px;'>D</th>
+                    <th style='color:{_TV["dim"]};font-size:8px;text-align:left;padding:2px 4px;'>ENTRY</th>
+                    <th style='color:{_TV["dim"]};font-size:8px;text-align:left;padding:2px 4px;'>PNL</th>
+                    <th style='color:{_TV["dim"]};font-size:8px;text-align:left;padding:2px 4px;'>RES</th>
                 </tr>
                 {rows_html}
             </table>
