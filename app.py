@@ -4,6 +4,7 @@
 
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
+import pandas as pd
 import sys, os
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -27,7 +28,6 @@ from data.trade_log import init_db, auto_close_on_price, maybe_log_signal, get_r
 
 init_db()
 
-# ── Timeframe map ─────────────────────────────────────────
 TF_MAP = {
     "1m":  ("1m",  "1d"),
     "5m":  ("5m",  "5d"),
@@ -43,7 +43,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
 st_autorefresh(interval=REFRESH_SECONDS * 1000, key="price_refresh")
 
 # ── CSS ───────────────────────────────────────────────────
@@ -57,29 +56,20 @@ st.markdown(f"""
     font-family:'IBM Plex Mono','Trebuchet MS',monospace;
 }}
 #MainMenu,footer,header{{visibility:hidden}}
+
+/* Give room for the fixed side toolbars (36px each) + 4px gap */
 .block-container{{
     padding-top:0.3rem;padding-bottom:0;
-    padding-left:0.5rem;padding-right:0.5rem;
+    padding-left:50px!important;padding-right:50px!important;
     max-width:100%!important;
 }}
-[data-testid="column"]{{padding:0 2px}}
+[data-testid="column"]{{padding:0 3px}}
 
-/* ── Neon gradient border ── */
-.stApp::after{{
-    content:'';position:fixed;inset:0;
-    border:2px solid transparent;
-    background:linear-gradient({COLOR_BG},{COLOR_BG}) padding-box,
-               linear-gradient(135deg,{COLOR_ACCENT}cc,#9c27b0cc,{COLOR_ACCENT}88,#9c27b0cc) border-box;
-    pointer-events:none;z-index:9998;
-    animation:borderPulse 4s ease-in-out infinite;
+@keyframes livePulse{{
+    0%,100%{{opacity:1;box-shadow:0 0 6px {COLOR_UP}}}
+    50%{{opacity:.4;box-shadow:0 0 16px {COLOR_UP}}}
 }}
 @keyframes borderPulse{{0%,100%{{opacity:.5}}50%{{opacity:1}}}}
-@keyframes livePulse{{0%,100%{{opacity:1;box-shadow:0 0 5px {COLOR_UP}}}50%{{opacity:.4;box-shadow:0 0 14px {COLOR_UP}}}}}
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar{{width:3px;height:3px}}
-::-webkit-scrollbar-track{{background:{COLOR_BG}}}
-::-webkit-scrollbar-thumb{{background:#2a2e39;border-radius:2px}}
 
 /* ── Number inputs ── */
 .stNumberInput input{{
@@ -92,8 +82,6 @@ st.markdown(f"""
     color:#787b86!important;font-family:'IBM Plex Mono',monospace!important;
     font-size:9px!important;letter-spacing:.5px!important;text-transform:uppercase!important;
 }}
-
-/* ── Form ── */
 div[data-testid="stForm"]{{
     background:{COLOR_PANEL};border:1px solid #2a2e39;border-radius:4px;padding:10px;margin-top:8px;
 }}
@@ -102,16 +90,14 @@ div[data-testid="stForm"]{{
 .stButton>button{{
     background:transparent!important;border:1px solid #2a2e39!important;color:#787b86!important;
     font-family:'IBM Plex Mono',monospace!important;font-size:10px!important;
-    letter-spacing:.5px!important;border-radius:3px!important;transition:all .15s ease!important;
+    letter-spacing:.5px!important;border-radius:3px!important;transition:all .15s!important;
 }}
 .stButton>button:hover{{border-color:{COLOR_ACCENT}!important;color:{COLOR_TEXT}!important}}
 button[kind="primary"]{{background:{COLOR_UP}18!important;border-color:{COLOR_UP}60!important;color:{COLOR_UP}!important}}
 button[kind="primary"]:hover{{background:{COLOR_UP}30!important}}
-
-/* ── Plotly ── */
 [data-testid="stPlotlyChart"]{{border:1px solid #2a2e39;border-radius:4px;overflow:hidden}}
 
-/* ── TradingView tab bar ── */
+/* ── TV Tab bar ── */
 [data-testid="stTabs"]{{background:{COLOR_BG}}}
 [data-testid="stTabsList"]{{
     background:{COLOR_PANEL}!important;border-bottom:1px solid #2a2e39!important;
@@ -122,20 +108,22 @@ button[kind="primary"]:hover{{background:{COLOR_UP}30!important}}
     border-bottom:2px solid transparent!important;border-radius:0!important;
     color:#787b86!important;font-family:'IBM Plex Mono',monospace!important;
     font-size:10px!important;letter-spacing:.8px!important;
-    padding:7px 14px!important;margin-bottom:-1px!important;transition:all .15s ease!important;
+    padding:7px 14px!important;margin-bottom:-1px!important;transition:all .15s!important;
 }}
 [data-testid="stTabsList"] button:hover{{color:{COLOR_TEXT}!important;background:{COLOR_ACCENT}08!important}}
 [data-testid="stTabsList"] button[aria-selected="true"]{{
-    color:{COLOR_TEXT}!important;border-bottom:2px solid {COLOR_ACCENT}!important;background:{COLOR_ACCENT}0a!important;
+    color:{COLOR_TEXT}!important;
+    border-bottom:2px solid {COLOR_ACCENT}!important;
+    background:{COLOR_ACCENT}0a!important;
 }}
 [data-testid="stTabPanel"]{{padding-top:2px!important}}
 
 /* ── Timeframe pills ── */
-[data-testid="stPills"]{{margin-bottom:0!important}}
+[data-testid="stPills"]{{margin-bottom:2px!important}}
 [data-testid="stPills"] button{{
     background:{COLOR_PANEL}!important;border:1px solid #2a2e39!important;
     color:#787b86!important;font-family:'IBM Plex Mono',monospace!important;
-    font-size:9px!important;border-radius:2px!important;padding:2px 9px!important;
+    font-size:9px!important;border-radius:2px!important;padding:2px 8px!important;
     letter-spacing:.5px!important;transition:all .12s!important;
     min-height:unset!important;height:22px!important;
 }}
@@ -145,53 +133,100 @@ button[kind="primary"]:hover{{background:{COLOR_UP}30!important}}
 }}
 [data-testid="stPills"] [data-testid="stWidgetLabel"]{{display:none!important}}
 
-/* ── Toolbar column shared style ── */
-.tv-toolbar{{
-    display:flex;flex-direction:column;align-items:center;
-    gap:1px;padding:6px 0 6px;
-    background:{COLOR_PANEL};border:1px solid #2a2e39;border-radius:4px;
-    min-height:420px;
-}}
-.tv-toolbar .tb-btn{{
+/* ── Fixed toolbar shared btn style ── */
+.tv-tb-btn{{
     width:30px;height:28px;display:flex;align-items:center;justify-content:center;
-    color:#4a4e5a;font-size:13px;cursor:pointer;border-radius:3px;
-    transition:all .12s;user-select:none;
+    color:#4a4e5a;font-size:13px;cursor:default;border-radius:3px;transition:background .12s;
 }}
-.tv-toolbar .tb-btn:hover{{background:{COLOR_ACCENT}18;color:{COLOR_TEXT}}}
-.tv-toolbar .tb-btn.active{{background:{COLOR_ACCENT}20;color:{COLOR_ACCENT}}}
-.tv-toolbar .tb-sep{{width:20px;height:1px;background:#2a2e39;margin:3px 0}}
+.tv-tb-btn:hover{{background:{COLOR_ACCENT}18;color:{COLOR_TEXT}}}
+.tv-tb-btn.on{{background:{COLOR_ACCENT}22;color:{COLOR_ACCENT}}}
+.tv-tb-sep{{width:22px;height:1px;background:#2a2e39;margin:2px auto}}
 
-/* ── Tablet (iPad 768–1100px) ── */
+/* ── Tablet (iPad ≤1100px) ── */
 @media(max-width:1100px){{
-    /* hide left-toolbar col 1 and model-scores col 2 */
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:nth-child(2){{display:none!important}}
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:nth-child(3){{
+    /* hide left model-scores panel, chart wider */
+    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:first-child{{display:none!important}}
+    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:nth-child(2){{
         flex:1 1 65%!important;max-width:65%!important;
     }}
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:nth-child(4){{
-        flex:1 1 30%!important;max-width:30%!important;
+    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:last-child{{
+        flex:1 1 35%!important;max-width:35%!important;
     }}
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:nth-child(5){{
-        flex:0 0 36px!important;max-width:36px!important;
-    }}
+    .block-container{{padding-left:44px!important;padding-right:44px!important}}
 }}
-
-/* ── Mobile (<768px) ── */
+/* ── Mobile ≤768px ── */
 @media(max-width:768px){{
     [data-testid="stHorizontalBlock"]{{flex-direction:column!important}}
     [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]{{
         width:100%!important;min-width:100%!important;max-width:100%!important;display:block!important;
     }}
-    .block-container{{padding-left:.3rem!important;padding-right:.3rem!important}}
+    .block-container{{padding-left:8px!important;padding-right:8px!important}}
+    .tv-fixed-toolbar{{display:none!important}}
     [data-testid="stTabsList"] button{{font-size:9px!important;padding:6px 8px!important}}
 }}
 </style>
 """, unsafe_allow_html=True)
 
-# ── Fetch base data (header + signals) ───────────────────
+# ── Fixed overlays: neon border + left/right toolbars ─────
+# NOTE: interior is rgba(0,0,0,0) — fully transparent — so content shows through
+st.html(f"""
+<!-- Neon gradient border (transparent interior, only the 2px edge is coloured) -->
+<div style='position:fixed;top:0;left:0;right:0;bottom:0;
+     border:2px solid transparent;pointer-events:none;z-index:9998;
+     animation:borderPulse 4s ease-in-out infinite;
+     background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0)) padding-box,
+                linear-gradient(135deg,{COLOR_ACCENT}cc,#9c27b0cc,{COLOR_ACCENT}88,#9c27b0cc) border-box;'></div>
+
+<!-- Left drawing toolbar -->
+<div class='tv-fixed-toolbar' style='position:fixed;left:4px;top:50%;transform:translateY(-50%);
+     background:{COLOR_PANEL};border:1px solid #2a2e39;border-radius:4px;
+     padding:5px 3px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:0;'>
+  <div class='tv-tb-btn on'  title='Crosshair'>⊕</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Trend Line'>╱</div>
+  <div class='tv-tb-btn' title='Horizontal Line'>━</div>
+  <div class='tv-tb-btn' title='Vertical Line'>┃</div>
+  <div class='tv-tb-btn' title='Ray'>↗</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Rectangle'>▭</div>
+  <div class='tv-tb-btn' title='Ellipse'>◯</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Fibonacci'>ƒ</div>
+  <div class='tv-tb-btn' title='Pitchfork'>⑂</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Text'>T</div>
+  <div class='tv-tb-btn' title='Measure'>⟷</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Magnet'>⊛</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Lock All'>🔒</div>
+  <div class='tv-tb-btn' title='Remove All' style='color:#f2364580;'>⊗</div>
+</div>
+
+<!-- Right icon strip -->
+<div class='tv-fixed-toolbar' style='position:fixed;right:4px;top:50%;transform:translateY(-50%);
+     background:{COLOR_PANEL};border:1px solid #2a2e39;border-radius:4px;
+     padding:5px 3px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:0;'>
+  <div class='tv-tb-btn on'  title='Watchlist'    style='color:{COLOR_ACCENT};'>≡</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Chart Layout'>◫</div>
+  <div class='tv-tb-btn' title='Indicators'>∿</div>
+  <div class='tv-tb-btn' title='Alerts'>◉</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn on'  title='News Feed'    style='color:{COLOR_UP};'>◈</div>
+  <div class='tv-tb-btn' title='Ideas'>💡</div>
+  <div class='tv-tb-btn' title='Screener'>⊞</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Data Window'>▤</div>
+  <div class='tv-tb-sep'></div>
+  <div class='tv-tb-btn' title='Settings'>⚙</div>
+</div>
+""")
+
+# ── Fetch base data ───────────────────────────────────────
 wti_price   = get_current_price(TICKER_WTI)
 brent_price = get_current_price(TICKER_BRENT)
-wti_df_base = get_ohlcv(TICKER_WTI)           # default 5m — for vol_summary in header
+wti_df_base = get_ohlcv(TICKER_WTI)
 vol_summary = get_volume_summary(wti_df_base)
 
 raw_news   = get_news_headlines()
@@ -224,8 +259,8 @@ recent_trades = get_recent_trades(20)
 open_trades   = get_open_trades()
 
 # ── Header bar ───────────────────────────────────────────
-wti_c_col   = COLOR_UP if wti_price["change"] >= 0 else COLOR_DOWN
-brent_c_col = COLOR_UP if brent_price["change"] >= 0 else COLOR_DOWN
+wti_c_col   = COLOR_UP   if wti_price["change"] >= 0 else COLOR_DOWN
+brent_c_col = COLOR_UP   if brent_price["change"] >= 0 else COLOR_DOWN
 wti_arr     = "▲" if wti_price["change"] >= 0 else "▼"
 brent_arr   = "▲" if brent_price["change"] >= 0 else "▼"
 sig_dir     = signal.get("direction", "—") if signal else "—"
@@ -236,9 +271,8 @@ conv_col    = COLOR_UP if conv["direction"] == "BULLISH" else COLOR_DOWN if conv
 
 st.html(f"""
 <div style='background:{COLOR_PANEL};border-bottom:1px solid #2a2e39;
-     padding:6px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;'>
+     padding:6px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;'>
 
-  <!-- Branding -->
   <div style='display:flex;align-items:center;gap:10px;flex-shrink:0;'>
     <div style='width:30px;height:30px;border-radius:5px;
          background:linear-gradient(135deg,{COLOR_ACCENT},{COLOR_ACCENT}88);
@@ -250,36 +284,34 @@ st.html(f"""
     </div>
   </div>
 
-  <!-- Price tiles -->
-  <div style='display:flex;flex:1;justify-content:center;'>
-    <div style='padding:3px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+  <div style='display:flex;flex:1;justify-content:center;flex-wrap:wrap;gap:0;'>
+    <div style='padding:3px 14px;border-right:1px solid #2a2e39;text-align:center;'>
       <div style='color:#787b86;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:1px;'>WTI CRUDE</div>
       <div style='color:{COLOR_TEXT};font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;line-height:1;'>${wti_price["price"]:.2f}</div>
-      <div style='color:{wti_c_col};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:1px;'>{wti_arr} {wti_price["change"]:+.2f} <span style='opacity:.65;'>({wti_price["change_p"]:+.2f}%)</span></div>
+      <div style='color:{wti_c_col};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:1px;'>{wti_arr} {wti_price["change"]:+.2f} <span style='opacity:.6;'>({wti_price["change_p"]:+.2f}%)</span></div>
     </div>
-    <div style='padding:3px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+    <div style='padding:3px 14px;border-right:1px solid #2a2e39;text-align:center;'>
       <div style='color:#787b86;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:1px;'>BRENT</div>
       <div style='color:{COLOR_TEXT};font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;line-height:1;'>${brent_price["price"]:.2f}</div>
-      <div style='color:{brent_c_col};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:1px;'>{brent_arr} {brent_price["change"]:+.2f} <span style='opacity:.65;'>({brent_price["change_p"]:+.2f}%)</span></div>
+      <div style='color:{brent_c_col};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:1px;'>{brent_arr} {brent_price["change"]:+.2f} <span style='opacity:.6;'>({brent_price["change_p"]:+.2f}%)</span></div>
     </div>
-    <div style='padding:3px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+    <div style='padding:3px 14px;border-right:1px solid #2a2e39;text-align:center;'>
       <div style='color:#787b86;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:1px;'>VOLUME</div>
       <div style='color:{COLOR_TEXT};font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:500;line-height:1;'>{vol_summary["current"]:,}</div>
       <div style='color:#4a4e5a;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:1px;'>AVG {vol_summary["avg"]:,}</div>
     </div>
-    <div style='padding:3px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+    <div style='padding:3px 14px;border-right:1px solid #2a2e39;text-align:center;'>
       <div style='color:#787b86;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:1px;'>AI SIGNAL</div>
       <div style='color:{sig_col};font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;line-height:1;'>{sig_icon} {sig_dir}</div>
       <div style='color:{sig_col};opacity:.7;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:1px;'>{sig_conf}% CONF</div>
     </div>
-    <div style='padding:3px 16px;text-align:center;'>
+    <div style='padding:3px 14px;text-align:center;'>
       <div style='color:#787b86;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:1px;'>MIROFISH</div>
       <div style='color:{conv_col};font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;line-height:1;'>{conv["direction"]}</div>
       <div style='color:#4a4e5a;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:1px;'>SCORE {conv["score"]:+}</div>
     </div>
   </div>
 
-  <!-- Live dot -->
   <div style='flex-shrink:0;text-align:right;'>
     <div style='display:flex;align-items:center;gap:5px;justify-content:flex-end;'>
       <div style='width:7px;height:7px;border-radius:50%;background:{COLOR_UP};
@@ -300,63 +332,20 @@ tab_chart, tab_mirofish, tab_pnl = st.tabs([
 
 # ══ TAB 1 · CHART ════════════════════════════════════════
 with tab_chart:
+    left_col, chart_col, right_col = st.columns([1.4, 5, 1.85])
 
-    # 5 columns: left-toolbar | model-panel | chart | news-panel | right-toolbar
-    ltool_col, left_col, chart_col, right_col, rtool_col = st.columns([0.28, 1.4, 5, 1.85, 0.28])
-
-    # ── Left drawing toolbar ──────────────────────────────
-    with ltool_col:
-        st.html(f"""
-        <div class='tv-toolbar' style='margin-top:0;'>
-          <div class='tb-btn active' title='Crosshair'>⊕</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Trend Line'>╱</div>
-          <div class='tb-btn' title='Horizontal Line'>━</div>
-          <div class='tb-btn' title='Vertical Line'>┃</div>
-          <div class='tb-btn' title='Ray'>↗</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Rectangle'>▭</div>
-          <div class='tb-btn' title='Ellipse'>◯</div>
-          <div class='tb-btn' title='Triangle'>△</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Fibonacci'>ƒ</div>
-          <div class='tb-btn' title='Pitchfork'>⑂</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Text'>T</div>
-          <div class='tb-btn' title='Measure'>⟷</div>
-          <div class='tb-btn' title='Price Range'>⇕</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Magnet'>⊛</div>
-          <div style='flex:1'></div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Lock All'>🔒</div>
-          <div class='tb-btn' title='Remove All' style='color:#f23645cc;'>⊗</div>
-        </div>
-        """)
-
-    # ── Model scores + account ────────────────────────────
     with left_col:
         render_left_panel(wti_price, brent_price)
 
-    # ── Main chart ────────────────────────────────────────
     with chart_col:
-
-        # Timeframe selector + chart subtitle bar
-        tf_bar_left, tf_bar_right = st.columns([3, 1])
-
-        with tf_bar_left:
-            selected_tf = st.pills(
-                "Timeframe",
-                options=list(TF_MAP.keys()),
-                default="5m",
-                key="chart_tf",
-            )
-
+        # Timeframe selector
+        selected_tf = st.pills(
+            "Timeframe", options=list(TF_MAP.keys()), default="5m", key="chart_tf"
+        )
         yf_interval, yf_period = TF_MAP.get(selected_tf or "5m", ("5m", "5d"))
         wti_df = get_ohlcv(TICKER_WTI, interval=yf_interval, period=yf_period)
 
         if not wti_df.empty:
-            import pandas as pd
             if isinstance(wti_df.columns, pd.MultiIndex):
                 wti_df.columns = wti_df.columns.get_level_values(0)
             high  = float(wti_df["High"].max())
@@ -371,7 +360,7 @@ with tab_chart:
              padding:3px 0 4px 2px;display:flex;gap:14px;align-items:center;
              border-bottom:1px solid #2a2e39;margin-bottom:3px;flex-wrap:wrap;'>
           <span style='color:{COLOR_TEXT};font-weight:600;font-size:11px;'>CL=F</span>
-          <span style='color:#787b86;font-size:9px;'>WTI CRUDE · {selected_tf or "5m"}</span>
+          <span style='font-size:9px;'>WTI CRUDE · {selected_tf or "5m"}</span>
           <span style='color:#4a4e5a;'>|</span>
           <span>O <span style='color:{COLOR_TEXT}'>${open_:.2f}</span></span>
           <span>H <span style='color:{COLOR_UP}'>${high:.2f}</span></span>
@@ -385,31 +374,9 @@ with tab_chart:
         fig = build_candlestick_chart(wti_df, f"CL=F · WTI CRUDE · {selected_tf or '5m'}")
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    # ── News + signal + paper trade ───────────────────────
     with right_col:
         render_right_panel(news_items, signal)
         render_trade_form(wti_price["price"], signal, open_trades)
-
-    # ── Right icon strip (TV-style panel toggles) ─────────
-    with rtool_col:
-        st.html(f"""
-        <div class='tv-toolbar' style='margin-top:0;'>
-          <div class='tb-btn active' title='Watchlist' style='color:{COLOR_ACCENT};'>≡</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Chart Layout'>◫</div>
-          <div class='tb-btn' title='Indicators'>∿</div>
-          <div class='tb-btn' title='Alerts'>◉</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn active' title='News Feed' style='color:{COLOR_UP};'>◈</div>
-          <div class='tb-btn' title='Ideas'>💡</div>
-          <div class='tb-btn' title='Screener'>⊞</div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Data Window'>▤</div>
-          <div style='flex:1'></div>
-          <div class='tb-sep'></div>
-          <div class='tb-btn' title='Settings'>⚙</div>
-        </div>
-        """)
 
 # ══ TAB 2 · MIROFISH ═════════════════════════════════════
 with tab_mirofish:
@@ -418,7 +385,7 @@ with tab_mirofish:
       <div style='width:3px;height:14px;background:{COLOR_ACCENT};border-radius:2px;'></div>
       <span style='color:{COLOR_TEXT};font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:1px;'>MIROFISH</span>
       <span style='color:#4a4e5a;font-family:"IBM Plex Mono",monospace;font-size:9px;'>RELATIONSHIP GRAPH · PHASE 3</span>
-      <div style='flex:1;height:1px;background:#2a2e39;margin-left:4px;'></div>
+      <div style='flex:1;height:1px;background:#2a2e39;'></div>
     </div>
     """)
     render_graph_panel()
@@ -427,15 +394,14 @@ with tab_mirofish:
 with tab_pnl:
     render_pnl_panel(pnl_stats, recent_trades)
 
-# ── Bottom PnL bar ────────────────────────────────────────
+# ── Bottom PnL status bar ─────────────────────────────────
 render_pnl_bar(pnl_stats)
 
 # ── Footer ────────────────────────────────────────────────
 st.html(f"""
 <div style='display:flex;align-items:center;justify-content:center;gap:12px;
-     border-top:1px solid #2a2e39;padding:5px 16px;margin-top:3px;
-     color:#4a4e5a;font-family:"IBM Plex Mono",monospace;font-size:8px;
-     letter-spacing:.5px;flex-wrap:wrap;'>
+     border-top:1px solid #2a2e39;padding:5px 16px;margin-top:2px;
+     color:#4a4e5a;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:.4px;flex-wrap:wrap;'>
   <span style='color:#787b86;'>{APP_TITLE}</span>
   <span>·</span><span>{VERSION}</span>
   <span>·</span><span>Yahoo Finance · 15-min delay</span>
