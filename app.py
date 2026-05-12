@@ -45,7 +45,7 @@ st.set_page_config(
 )
 st_autorefresh(interval=REFRESH_SECONDS * 1000, key="price_refresh")
 
-# ── CSS ───────────────────────────────────────────────────
+# ── CSS — no animations, no glows, no shadows ────────────
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
@@ -55,162 +55,172 @@ st.markdown(f"""
     color:{COLOR_TEXT};
     font-family:'IBM Plex Mono','Trebuchet MS',monospace;
 }}
-#MainMenu,footer,header{{visibility:hidden}}
-.block-container{{
-    padding-top:0.3rem;padding-bottom:1rem;
-    padding-left:52px!important;padding-right:52px!important;
-    max-width:100%!important;
+#MainMenu,footer,header {{ visibility:hidden }}
+.block-container {{
+    padding-top:0.3rem;
+    padding-bottom:1rem;
+    padding-left:52px !important;
+    padding-right:52px !important;
+    max-width:100% !important;
 }}
-[data-testid="column"]{{padding:0 3px}}
-::-webkit-scrollbar{{width:3px;height:3px}}
-::-webkit-scrollbar-track{{background:{COLOR_BG}}}
-::-webkit-scrollbar-thumb{{background:#2a2e39;border-radius:2px}}
-
-/* ── Keyframes ── */
-@keyframes livePulse{{
-    0%,100%{{opacity:1;box-shadow:0 0 6px {COLOR_UP},0 0 14px {COLOR_UP}44}}
-    50%{{opacity:.5;box-shadow:0 0 3px {COLOR_UP}}}
-}}
-@keyframes priceGlow{{
-    0%,100%{{text-shadow:0 0 8px currentColor}}
-    50%{{text-shadow:0 0 20px currentColor,0 0 40px currentColor44}}
-}}
+[data-testid="column"] {{ padding:0 3px }}
+::-webkit-scrollbar {{ width:3px; height:3px }}
+::-webkit-scrollbar-track {{ background:{COLOR_BG} }}
+::-webkit-scrollbar-thumb {{ background:#2a2e39; border-radius:2px }}
 
 /* ── Number inputs ── */
-.stNumberInput input{{
-    background-color:{COLOR_BG}!important;color:{COLOR_TEXT}!important;
-    border:1px solid #2a2e39!important;border-radius:3px!important;
-    font-family:'IBM Plex Mono',monospace!important;font-size:11px!important;padding:4px 8px!important;
+.stNumberInput input {{
+    background-color:{COLOR_BG} !important;
+    color:{COLOR_TEXT} !important;
+    border:1px solid #2a2e39 !important;
+    border-radius:3px !important;
+    font-family:'IBM Plex Mono',monospace !important;
+    font-size:11px !important;
+    padding:4px 8px !important;
 }}
-.stNumberInput input:focus{{border-color:{COLOR_ACCENT}!important;box-shadow:0 0 0 2px {COLOR_ACCENT}30!important}}
-.stNumberInput label{{
-    color:#9ca3af!important;font-family:'IBM Plex Mono',monospace!important;
-    font-size:9px!important;letter-spacing:.5px!important;text-transform:uppercase!important;
+.stNumberInput input:focus {{
+    border-color:{COLOR_ACCENT} !important;
+    box-shadow:none !important;
 }}
-div[data-testid="stForm"]{{
-    background:{COLOR_PANEL};border:1px solid #2f3446;border-radius:4px;padding:10px;margin-top:8px;
+.stNumberInput label {{
+    color:#9ca3af !important;
+    font-family:'IBM Plex Mono',monospace !important;
+    font-size:9px !important;
+    letter-spacing:.5px !important;
+    text-transform:uppercase !important;
 }}
-
-/* ── Buttons ── */
-.stButton>button{{
-    background:transparent!important;border:1px solid #2f3446!important;color:#9ca3af!important;
-    font-family:'IBM Plex Mono',monospace!important;font-size:10px!important;
-    letter-spacing:.5px!important;border-radius:3px!important;transition:all .15s!important;
-}}
-.stButton>button:hover{{
-    border-color:{COLOR_ACCENT}!important;color:{COLOR_TEXT}!important;
-    background:{COLOR_ACCENT}12!important;
-}}
-button[kind="primary"]{{
-    background:{COLOR_UP}20!important;border-color:{COLOR_UP}70!important;color:{COLOR_UP}!important;
-    box-shadow:0 0 8px {COLOR_UP}22!important;
-}}
-button[kind="primary"]:hover{{background:{COLOR_UP}35!important;box-shadow:0 0 12px {COLOR_UP}44!important}}
-[data-testid="stPlotlyChart"]{{border:1px solid #2f3446;border-radius:4px;overflow:hidden}}
-
-/* ── Timeframe pills ── */
-[data-testid="stPills"]{{margin-bottom:0!important}}
-[data-testid="stPills"] button{{
-    background:{COLOR_PANEL}!important;border:1px solid #2f3446!important;
-    color:#9ca3af!important;font-family:'IBM Plex Mono',monospace!important;
-    font-size:9px!important;border-radius:2px!important;padding:2px 9px!important;
-    letter-spacing:.5px!important;transition:all .12s!important;min-height:unset!important;height:22px!important;
-}}
-[data-testid="stPills"] button:hover{{
-    color:{COLOR_TEXT}!important;border-color:{COLOR_ACCENT}90!important;background:{COLOR_ACCENT}10!important;
-}}
-[data-testid="stPills"] button[aria-checked="true"]{{
-    background:{COLOR_ACCENT}22!important;border-color:{COLOR_ACCENT}!important;
-    color:#fff!important;box-shadow:0 0 8px {COLOR_ACCENT}44!important;
-}}
-[data-testid="stPills"] [data-testid="stWidgetLabel"]{{display:none!important}}
-
-/* ── Fixed toolbar buttons ── */
-.tv-tb-btn{{
-    width:32px;height:30px;display:flex;align-items:center;justify-content:center;
-    color:#4a5568;font-size:14px;cursor:default;border-radius:3px;transition:all .15s;
-}}
-.tv-tb-btn:hover{{background:{COLOR_ACCENT}18;color:{COLOR_TEXT}}}
-.tv-tb-btn.on{{background:{COLOR_ACCENT}25;color:{COLOR_ACCENT};box-shadow:inset 0 0 6px {COLOR_ACCENT}30}}
-.tv-tb-sep{{width:20px;height:1px;background:#2a2e39;margin:3px auto}}
-
-/* ── Section dividers ── */
-.sec-header{{
-    display:flex;align-items:center;gap:8px;
-    padding:10px 2px 7px;
-    border-top:1px solid #2a2e39;
+div[data-testid="stForm"] {{
+    background:{COLOR_PANEL};
+    border:1px solid #2a2e39;
+    border-radius:4px;
+    padding:10px;
     margin-top:8px;
 }}
 
+/* ── Buttons ── */
+.stButton > button {{
+    background:transparent !important;
+    border:1px solid #2a2e39 !important;
+    color:#9ca3af !important;
+    font-family:'IBM Plex Mono',monospace !important;
+    font-size:10px !important;
+    letter-spacing:.5px !important;
+    border-radius:3px !important;
+}}
+.stButton > button:hover {{
+    border-color:{COLOR_ACCENT} !important;
+    color:{COLOR_TEXT} !important;
+    background:{COLOR_ACCENT}12 !important;
+}}
+button[kind="primary"] {{
+    background:{COLOR_UP}20 !important;
+    border-color:{COLOR_UP} !important;
+    color:{COLOR_UP} !important;
+}}
+button[kind="primary"]:hover {{ background:{COLOR_UP}35 !important }}
+[data-testid="stPlotlyChart"] {{
+    border:1px solid #2a2e39;
+    border-radius:4px;
+    overflow:hidden;
+}}
+
+/* ── Timeframe pills ── */
+[data-testid="stPills"] {{ margin-bottom:0 !important }}
+[data-testid="stPills"] button {{
+    background:{COLOR_PANEL} !important;
+    border:1px solid #2a2e39 !important;
+    color:#9ca3af !important;
+    font-family:'IBM Plex Mono',monospace !important;
+    font-size:9px !important;
+    border-radius:2px !important;
+    padding:2px 9px !important;
+    letter-spacing:.5px !important;
+    min-height:unset !important;
+    height:22px !important;
+}}
+[data-testid="stPills"] button:hover {{
+    color:{COLOR_TEXT} !important;
+    border-color:{COLOR_ACCENT} !important;
+}}
+[data-testid="stPills"] button[aria-checked="true"] {{
+    background:{COLOR_ACCENT}25 !important;
+    border-color:{COLOR_ACCENT} !important;
+    color:#fff !important;
+}}
+[data-testid="stPills"] [data-testid="stWidgetLabel"] {{ display:none !important }}
+
+/* ── Fixed toolbar buttons ── */
+.tv-tb-btn {{
+    width:32px; height:30px;
+    display:flex; align-items:center; justify-content:center;
+    color:#4a5568; font-size:14px; cursor:default; border-radius:3px;
+}}
+.tv-tb-btn.on {{ background:{COLOR_ACCENT}22; color:{COLOR_ACCENT} }}
+.tv-tb-sep {{ width:20px; height:1px; background:#2a2e39; margin:3px auto }}
+
 /* ── Tablet ≤1100px ── */
-@media(max-width:1100px){{
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:first-child{{display:none!important}}
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:nth-child(2){{flex:1 1 65%!important;max-width:65%!important}}
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]:last-child{{flex:1 1 35%!important;max-width:35%!important}}
-    .block-container{{padding-left:46px!important;padding-right:46px!important}}
+@media(max-width:1100px) {{
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {{ display:none !important }}
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) {{ flex:1 1 65% !important; max-width:65% !important }}
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child   {{ flex:1 1 35% !important; max-width:35% !important }}
+    .block-container {{ padding-left:46px !important; padding-right:46px !important }}
 }}
 /* ── Mobile ≤768px ── */
-@media(max-width:768px){{
-    [data-testid="stHorizontalBlock"]{{flex-direction:column!important}}
-    [data-testid="stHorizontalBlock"]>[data-testid="stColumn"]{{
-        width:100%!important;min-width:100%!important;max-width:100%!important;display:block!important;
+@media(max-width:768px) {{
+    [data-testid="stHorizontalBlock"] {{ flex-direction:column !important }}
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {{
+        width:100% !important; min-width:100% !important; max-width:100% !important; display:block !important;
     }}
-    .block-container{{padding-left:8px!important;padding-right:8px!important}}
-    .tv-fixed-toolbar{{display:none!important}}
+    .block-container {{ padding-left:8px !important; padding-right:8px !important }}
+    .tv-fixed-toolbar {{ display:none !important }}
 }}
 </style>
 """, unsafe_allow_html=True)
 
-# ── Static neon border + fixed toolbars (no animation) ───
+# ── Fixed side toolbars (no border overlay — removed) ─────
 st.html(f"""
-<div style='position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:9998;
-     border:2px solid transparent;
-     background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0)) padding-box,
-                linear-gradient(135deg,{COLOR_ACCENT}99,#7c3aed99,{COLOR_ACCENT}66) border-box;'></div>
-
-<div class='tv-fixed-toolbar' style='position:fixed;left:4px;top:50%;transform:translateY(-50%);
-     background:{COLOR_PANEL};border:1px solid #2f3446;border-radius:5px;
-     padding:6px 3px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:0;
-     box-shadow:2px 0 12px rgba(0,0,0,.4);'>
-  <div class='tv-tb-btn on' title='Crosshair'>⊕</div>
+<div class='tv-fixed-toolbar' style='
+    position:fixed; left:4px; top:50%; transform:translateY(-50%);
+    background:{COLOR_PANEL}; border:1px solid #2a2e39; border-radius:4px;
+    padding:5px 3px; z-index:200;
+    display:flex; flex-direction:column; align-items:center; gap:0;'>
+  <div class='tv-tb-btn on'>⊕</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Trend Line'>╱</div>
-  <div class='tv-tb-btn' title='H-Line'>━</div>
-  <div class='tv-tb-btn' title='V-Line'>┃</div>
-  <div class='tv-tb-btn' title='Ray'>↗</div>
+  <div class='tv-tb-btn'>╱</div>
+  <div class='tv-tb-btn'>━</div>
+  <div class='tv-tb-btn'>┃</div>
+  <div class='tv-tb-btn'>↗</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Rectangle'>▭</div>
-  <div class='tv-tb-btn' title='Ellipse'>◯</div>
+  <div class='tv-tb-btn'>▭</div>
+  <div class='tv-tb-btn'>◯</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Fibonacci'>ƒ</div>
-  <div class='tv-tb-btn' title='Pitchfork'>⑂</div>
+  <div class='tv-tb-btn'>ƒ</div>
+  <div class='tv-tb-btn'>⑂</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Text'>T</div>
-  <div class='tv-tb-btn' title='Measure'>⟷</div>
+  <div class='tv-tb-btn'>T</div>
+  <div class='tv-tb-btn'>⟷</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Magnet'>⊛</div>
-  <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Lock' style='font-size:11px;'>🔒</div>
-  <div class='tv-tb-btn' title='Clear' style='color:#f2364560;font-size:11px;'>⊗</div>
+  <div class='tv-tb-btn'>🔒</div>
+  <div class='tv-tb-btn' style='color:#f2364560;'>⊗</div>
 </div>
 
-<div class='tv-fixed-toolbar' style='position:fixed;right:4px;top:50%;transform:translateY(-50%);
-     background:{COLOR_PANEL};border:1px solid #2f3446;border-radius:5px;
-     padding:6px 3px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:0;
-     box-shadow:-2px 0 12px rgba(0,0,0,.4);'>
-  <div class='tv-tb-btn on' title='Watchlist' style='color:{COLOR_ACCENT};'>≡</div>
+<div class='tv-fixed-toolbar' style='
+    position:fixed; right:4px; top:50%; transform:translateY(-50%);
+    background:{COLOR_PANEL}; border:1px solid #2a2e39; border-radius:4px;
+    padding:5px 3px; z-index:200;
+    display:flex; flex-direction:column; align-items:center; gap:0;'>
+  <div class='tv-tb-btn on' style='color:{COLOR_ACCENT};'>≡</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Layout'>◫</div>
-  <div class='tv-tb-btn' title='Indicators'>∿</div>
-  <div class='tv-tb-btn' title='Alerts'>◉</div>
+  <div class='tv-tb-btn'>◫</div>
+  <div class='tv-tb-btn'>∿</div>
+  <div class='tv-tb-btn'>◉</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn on' title='News' style='color:{COLOR_UP};'>◈</div>
-  <div class='tv-tb-btn' title='Ideas'>💡</div>
-  <div class='tv-tb-btn' title='Screener'>⊞</div>
+  <div class='tv-tb-btn on' style='color:{COLOR_UP};'>◈</div>
+  <div class='tv-tb-btn'>⊞</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Data'>▤</div>
+  <div class='tv-tb-btn'>▤</div>
   <div class='tv-tb-sep'></div>
-  <div class='tv-tb-btn' title='Settings'>⚙</div>
+  <div class='tv-tb-btn'>⚙</div>
 </div>
 """)
 
@@ -249,89 +259,87 @@ pnl_stats     = get_stats()
 recent_trades = get_recent_trades(20)
 open_trades   = get_open_trades()
 
-# ── Header ───────────────────────────────────────────────
-wti_c   = COLOR_UP   if wti_price["change"] >= 0 else COLOR_DOWN
-brent_c = COLOR_UP   if brent_price["change"] >= 0 else COLOR_DOWN
-wti_a   = "▲" if wti_price["change"] >= 0 else "▼"
-brent_a = "▲" if brent_price["change"] >= 0 else "▼"
+# ── Derived display values ────────────────────────────────
+wti_c    = COLOR_UP   if wti_price["change"] >= 0 else COLOR_DOWN
+brent_c  = COLOR_UP   if brent_price["change"] >= 0 else COLOR_DOWN
+wti_a    = "▲" if wti_price["change"] >= 0 else "▼"
+brent_a  = "▲" if brent_price["change"] >= 0 else "▼"
 sig_dir  = signal.get("direction", "—") if signal else "—"
 sig_conf = signal.get("confidence", 0)  if signal else 0
-sig_col  = COLOR_UP if sig_dir == "LONG" else COLOR_DOWN if sig_dir == "SHORT" else "#787b86"
+sig_col  = COLOR_UP if sig_dir == "LONG" else COLOR_DOWN if sig_dir == "SHORT" else "#9ca3af"
 sig_icon = "▲" if sig_dir == "LONG" else "▼" if sig_dir == "SHORT" else "◆"
 conv_col = COLOR_UP if conv["direction"] == "BULLISH" else COLOR_DOWN if conv["direction"] == "BEARISH" else COLOR_GOLD
 
+# ── Header bar ───────────────────────────────────────────
 st.html(f"""
-<div style='background:linear-gradient(180deg,#232834,{COLOR_PANEL});
-     border-bottom:1px solid #2f3446;padding:7px 14px;
-     display:flex;align-items:center;justify-content:space-between;gap:10px;
-     box-shadow:0 2px 16px rgba(0,0,0,.5);'>
-
+<div style='
+    background:{COLOR_PANEL};
+    border-bottom:2px solid {COLOR_ACCENT}55;
+    padding:8px 14px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+'>
+  <!-- Logo -->
   <div style='display:flex;align-items:center;gap:10px;flex-shrink:0;'>
-    <div style='width:32px;height:32px;border-radius:6px;
-         background:linear-gradient(135deg,{COLOR_ACCENT},{COLOR_ACCENT}88);
-         display:flex;align-items:center;justify-content:center;font-size:16px;
-         box-shadow:0 0 18px {COLOR_ACCENT}66,0 0 6px {COLOR_ACCENT};'>🛢</div>
+    <div style='
+        width:32px; height:32px; border-radius:6px;
+        background:{COLOR_ACCENT};
+        display:flex; align-items:center; justify-content:center; font-size:16px;
+    '>🛢</div>
     <div>
       <div style='color:#fff;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.5px;'>{APP_TITLE}</div>
       <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;margin-top:1px;'>{APP_SUBTITLE} · {VERSION}</div>
     </div>
   </div>
 
+  <!-- Price tiles -->
   <div style='display:flex;flex:1;justify-content:center;flex-wrap:wrap;'>
-    <div style='padding:4px 16px;border-right:1px solid #2f3446;text-align:center;'>
-      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>WTI CRUDE</div>
-      <div style='color:{wti_c};font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:600;line-height:1;
-                  text-shadow:0 0 12px {wti_c}88;'>${wti_price["price"]:.2f}</div>
-      <div style='color:{wti_c};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:2px;opacity:.85;'>
-        {wti_a} {wti_price["change"]:+.2f} ({wti_price["change_p"]:+.2f}%)</div>
+    <div style='padding:4px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+      <div style='color:#9ca3af;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>WTI CRUDE</div>
+      <div style='color:{wti_c};font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:600;line-height:1;'>${wti_price["price"]:.2f}</div>
+      <div style='color:{wti_c};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:2px;'>{wti_a} {wti_price["change"]:+.2f} ({wti_price["change_p"]:+.2f}%)</div>
     </div>
-    <div style='padding:4px 16px;border-right:1px solid #2f3446;text-align:center;'>
-      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>BRENT</div>
-      <div style='color:{brent_c};font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:600;line-height:1;
-                  text-shadow:0 0 12px {brent_c}88;'>${brent_price["price"]:.2f}</div>
-      <div style='color:{brent_c};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:2px;opacity:.85;'>
-        {brent_a} {brent_price["change"]:+.2f} ({brent_price["change_p"]:+.2f}%)</div>
+    <div style='padding:4px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+      <div style='color:#9ca3af;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>BRENT</div>
+      <div style='color:{brent_c};font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:600;line-height:1;'>${brent_price["price"]:.2f}</div>
+      <div style='color:{brent_c};font-family:"IBM Plex Mono",monospace;font-size:10px;margin-top:2px;'>{brent_a} {brent_price["change"]:+.2f} ({brent_price["change_p"]:+.2f}%)</div>
     </div>
-    <div style='padding:4px 16px;border-right:1px solid #2f3446;text-align:center;'>
-      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>VOLUME</div>
+    <div style='padding:4px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+      <div style='color:#9ca3af;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>VOLUME</div>
       <div style='color:{COLOR_TEXT};font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:500;line-height:1;'>{vol_summary["current"]:,}</div>
-      <div style='color:#4a5568;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:2px;'>AVG {vol_summary["avg"]:,}</div>
+      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:2px;'>AVG {vol_summary["avg"]:,}</div>
     </div>
-    <div style='padding:4px 16px;border-right:1px solid #2f3446;text-align:center;'>
-      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>AI SIGNAL</div>
-      <div style='color:{sig_col};font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600;line-height:1;
-                  text-shadow:0 0 14px {sig_col}99;'>{sig_icon} {sig_dir}</div>
-      <div style='color:{sig_col};font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:2px;opacity:.75;'>{sig_conf}% CONF</div>
+    <div style='padding:4px 16px;border-right:1px solid #2a2e39;text-align:center;'>
+      <div style='color:#9ca3af;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>AI SIGNAL</div>
+      <div style='color:{sig_col};font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600;line-height:1;'>{sig_icon} {sig_dir}</div>
+      <div style='color:{sig_col};font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:2px;'>{sig_conf}% CONF</div>
     </div>
     <div style='padding:4px 16px;text-align:center;'>
-      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>MIROFISH</div>
-      <div style='color:{conv_col};font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;line-height:1;
-                  text-shadow:0 0 10px {conv_col}77;'>{conv["direction"]}</div>
-      <div style='color:#4a5568;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:2px;'>SCORE {conv["score"]:+}</div>
+      <div style='color:#9ca3af;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:1px;margin-bottom:2px;'>MIROFISH</div>
+      <div style='color:{conv_col};font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;line-height:1;'>{conv["direction"]}</div>
+      <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:9px;margin-top:2px;'>SCORE {conv["score"]:+}</div>
     </div>
   </div>
 
+  <!-- Status -->
   <div style='flex-shrink:0;text-align:right;'>
     <div style='display:flex;align-items:center;gap:6px;justify-content:flex-end;'>
-      <div style='width:8px;height:8px;border-radius:50%;background:{COLOR_UP};
-           animation:livePulse 2s ease-in-out infinite;'></div>
-      <span style='color:{COLOR_UP};font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
-            letter-spacing:2px;text-shadow:0 0 8px {COLOR_UP};'>LIVE</span>
+      <div style='width:7px;height:7px;border-radius:50%;background:{COLOR_UP};'></div>
+      <span style='color:{COLOR_UP};font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:2px;'>LIVE</span>
     </div>
-    <div style='color:#4a5568;font-family:"IBM Plex Mono",monospace;font-size:8px;margin-top:3px;'>↻ {REFRESH_SECONDS}s</div>
+    <div style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:8px;margin-top:3px;'>↻ {REFRESH_SECONDS}s</div>
   </div>
 </div>
 """)
 
-# ── Timeframe row ─────────────────────────────────────────
-tf_col, spacer = st.columns([2, 8])
+# ── Timeframe selector ────────────────────────────────────
+tf_col, _ = st.columns([2, 8])
 with tf_col:
     selected_tf = st.pills("TF", options=list(TF_MAP.keys()), default="5m", key="chart_tf")
 
 yf_interval, yf_period = TF_MAP.get(selected_tf or "5m", ("5m", "5d"))
 wti_df = get_ohlcv(TICKER_WTI, interval=yf_interval, period=yf_period)
 
-# ── MAIN 3-COL LAYOUT ────────────────────────────────────
+# ── 3-column chart layout ─────────────────────────────────
 left_col, chart_col, right_col = st.columns([1.4, 5, 1.85])
 
 with left_col:
@@ -349,20 +357,24 @@ with chart_col:
         high = low = close = open_ = 0.0
 
     st.html(f"""
-    <div style='font-family:"IBM Plex Mono",monospace;font-size:10px;color:#6b7280;
-         padding:3px 0 5px 2px;display:flex;gap:14px;align-items:center;
-         border-bottom:1px solid #2f3446;margin-bottom:4px;flex-wrap:wrap;'>
-      <span style='color:#fff;font-weight:600;font-size:12px;letter-spacing:.3px;'>CL=F</span>
-      <span style='color:#6b7280;font-size:9px;'>WTI CRUDE · {selected_tf or "5m"}</span>
-      <span style='color:#2f3446;'>|</span>
-      <span>O <span style='color:{COLOR_TEXT};font-weight:500;'>${open_:.2f}</span></span>
-      <span>H <span style='color:{COLOR_UP};font-weight:500;'>${high:.2f}</span></span>
-      <span>L <span style='color:{COLOR_DOWN};font-weight:500;'>${low:.2f}</span></span>
-      <span>C <span style='color:{COLOR_TEXT};font-weight:500;'>${close:.2f}</span></span>
-      <span style='color:#2f3446;'>|</span>
+    <div style='
+        font-family:"IBM Plex Mono",monospace; font-size:10px; color:#6b7280;
+        padding:3px 0 5px 2px;
+        display:flex; gap:14px; align-items:center;
+        border-bottom:1px solid #2a2e39; margin-bottom:4px; flex-wrap:wrap;
+    '>
+      <span style='color:#fff;font-weight:600;font-size:12px;'>CL=F</span>
+      <span style='font-size:9px;'>WTI CRUDE · {selected_tf or "5m"}</span>
+      <span style='color:#2a2e39;'>|</span>
+      <span>O <span style='color:{COLOR_TEXT};'>${open_:.2f}</span></span>
+      <span>H <span style='color:{COLOR_UP};'>${high:.2f}</span></span>
+      <span>L <span style='color:{COLOR_DOWN};'>${low:.2f}</span></span>
+      <span>C <span style='color:{COLOR_TEXT};'>${close:.2f}</span></span>
+      <span style='color:#2a2e39;'>|</span>
       <span>VOL <span style='color:{COLOR_TEXT};'>{vol_summary["current"]:,}</span></span>
     </div>
     """)
+
     fig = build_candlestick_chart(wti_df, f"CL=F · WTI CRUDE · {selected_tf or '5m'}")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
@@ -372,34 +384,34 @@ with right_col:
 
 # ── MIROFISH ─────────────────────────────────────────────
 st.html(f"""
-<div class='sec-header'>
-  <div style='width:3px;height:16px;background:linear-gradient({COLOR_ACCENT},{COLOR_ACCENT}44);border-radius:2px;box-shadow:0 0 6px {COLOR_ACCENT};'></div>
+<div style='display:flex;align-items:center;gap:8px;padding:10px 2px 6px;border-top:1px solid #2a2e39;margin-top:6px;'>
+  <div style='width:3px;height:14px;background:{COLOR_ACCENT};border-radius:2px;'></div>
   <span style='color:#e2e8f0;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:1px;'>MIROFISH</span>
-  <span style='color:#4a5568;font-family:"IBM Plex Mono",monospace;font-size:9px;'>RELATIONSHIP GRAPH · PHASE 3</span>
-  <div style='flex:1;height:1px;background:linear-gradient(#2f3446,transparent);margin-left:6px;'></div>
+  <span style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:9px;'>RELATIONSHIP GRAPH · PHASE 3</span>
+  <div style='flex:1;height:1px;background:#2a2e39;margin-left:4px;'></div>
 </div>
 """)
 render_graph_panel()
 
 # ── PNL TRACKER ──────────────────────────────────────────
 st.html(f"""
-<div class='sec-header'>
-  <div style='width:3px;height:16px;background:linear-gradient({COLOR_GOLD},{COLOR_GOLD}44);border-radius:2px;box-shadow:0 0 6px {COLOR_GOLD}88;'></div>
+<div style='display:flex;align-items:center;gap:8px;padding:10px 2px 6px;border-top:1px solid #2a2e39;margin-top:4px;'>
+  <div style='width:3px;height:14px;background:{COLOR_GOLD};border-radius:2px;'></div>
   <span style='color:#e2e8f0;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:1px;'>PNL TRACKER</span>
-  <span style='color:#4a5568;font-family:"IBM Plex Mono",monospace;font-size:9px;'>EQUITY CURVE · TRADE LOG</span>
-  <div style='flex:1;height:1px;background:linear-gradient(#2f3446,transparent);margin-left:6px;'></div>
+  <span style='color:#6b7280;font-family:"IBM Plex Mono",monospace;font-size:9px;'>EQUITY CURVE · TRADE LOG</span>
+  <div style='flex:1;height:1px;background:#2a2e39;margin-left:4px;'></div>
 </div>
 """)
 render_pnl_panel(pnl_stats, recent_trades)
-
-# ── PNL STATUS BAR ────────────────────────────────────────
 render_pnl_bar(pnl_stats)
 
-# ── FOOTER ────────────────────────────────────────────────
+# ── Footer ────────────────────────────────────────────────
 st.html(f"""
-<div style='display:flex;align-items:center;justify-content:center;gap:12px;
-     border-top:1px solid #2f3446;padding:6px 16px;margin-top:4px;
-     color:#4a5568;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:.4px;flex-wrap:wrap;'>
+<div style='
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    border-top:1px solid #2a2e39; padding:6px 16px; margin-top:4px;
+    color:#6b7280; font-family:"IBM Plex Mono",monospace; font-size:8px; letter-spacing:.4px; flex-wrap:wrap;
+'>
   <span style='color:#9ca3af;font-weight:500;'>{APP_TITLE}</span>
   <span>·</span><span>{VERSION}</span>
   <span>·</span><span>Yahoo Finance · 15-min delay</span>
